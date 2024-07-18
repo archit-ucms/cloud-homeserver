@@ -37,17 +37,22 @@ services:
       - "80:80"
     environment:
       CF_DNS_API_TOKEN: "${CF_DNS_API_TOKEN}"
-      CF_ZONE_API_TOKEN: "${CF_ZONE_API_TOKEN}"
+    networks:
+      - traefik
 
   authelia_redis:
     image: redis
     restart: unless-stopped
     container_name: authelia_redis
+    networks:
+      - traefik
 
   authelia_generate_secrets:
     build: generate_secrets
     volumes:
       - ../data/authelia/secrets:/secrets
+    networks:
+      - traefik
 
   authelia:
     image: authelia/authelia
@@ -74,3 +79,9 @@ services:
       AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE: /config/secrets/JWT_SECRET
       AUTHELIA_SESSION_SECRET_FILE: /config/secrets/SESSION_SECRET
       AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: /config/secrets/STORAGE_ENCRYPTION_KEY
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
